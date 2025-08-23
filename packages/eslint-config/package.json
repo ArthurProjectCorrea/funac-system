@@ -3,9 +3,11 @@
   "version": "0.0.0",
   "type": "module",
   "private": true,
+  "main": "./base.js",
   "exports": {
+    ".": "./base.js",
     "./base": "./base.js",
-    "./next-js": "./next.js",
+  "./next-js": "./next.js",
     "./react-internal": "./react-internal.js"
   },
   "devDependencies": {

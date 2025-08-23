@@ -1,0 +1,12 @@
+{
+  "extends": "../../packages/typescript-config/base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "baseUrl": "./",
+  "module": "Node16",
+  "moduleResolution": "Node16",
+  "experimentalDecorators": true,
+  "emitDecoratorMetadata": true,
+  "useDefineForClassFields": false
+  }
+}
