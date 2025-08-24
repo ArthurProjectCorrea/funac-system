@@ -2,7 +2,10 @@
 applyTo: '**'
 ---
 
+
 Instruções para análise de versionamento e geração de relatório para preenchimento do changeset:
+
+Antes de iniciar, é OBRIGATÓRIO conferir todos os commits feitos desde o último merge para a branch main utilizando comandos git (ex: git log, git merge-base, etc). Só prossiga após garantir que todos os commits relevantes foram analisados.
 
 1. Para cada projeto do monorepo (identificado pelo escopo nos commits, ex: web, api, docs, ui, etc), analise todos os commits feitos desde o último merge para a branch main.
 2. Classifique cada commit pelo Conventional Commits e determine se ele é versionável (tipos versionáveis: feat, fix, perf, BREAKING CHANGE, etc). Commits não versionáveis (chore, docs, style, test, build, ci, refactor sem breaking change) não alteram o versionamento.
