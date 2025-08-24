@@ -53,7 +53,7 @@ describe('AuthService', () => {
       headers: { 'x-forwarded-for': '127.0.0.1' },
     } as any);
     expect(result.access_token).toBe('token');
-    expect(result.user.email).toBe('test@test.com');
+    expect(result.email).toBe('test@test.com');
   });
 
   it('should register login attempt', async () => {

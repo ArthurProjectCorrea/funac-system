@@ -27,21 +27,21 @@ describe('UserService', () => {
 
   it('should throw if email exists', async () => {
     userModel.findOne.mockResolvedValue({ email: 'test@test.com' });
-    await expect(service.createUser('test@test.com', 'Senha123!', 'user')).rejects.toThrow(
+    await expect(service.createUser('Test User', 'test@test.com', 'Senha123!', 'user')).rejects.toThrow(
       ConflictException,
     );
   });
 
   it('should throw if password is weak', async () => {
     userModel.findOne.mockResolvedValue(null);
-    await expect(service.createUser('test2@test.com', '123', 'user')).rejects.toThrow(
+    await expect(service.createUser('Test2 User', 'test2@test.com', '123', 'user')).rejects.toThrow(
       ConflictException,
     );
   });
 
   it('should create user if valid', async () => {
     userModel.findOne.mockResolvedValue(null);
-    const result = await service.createUser('test3@test.com', 'Senha123!', 'user');
+    const result = await service.createUser('Test3 User', 'test3@test.com', 'Senha123!', 'user');
     expect(result).toBeDefined();
   });
 
