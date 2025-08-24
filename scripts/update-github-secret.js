@@ -25,12 +25,16 @@ if (!token) {
 }
 
 // Atualiza o secret no repositório usando GitHub CLI
-function getRepoInfo() {
-  // Defina manualmente o owner e repo do GitHub
-  return { owner: 'ArthurProjectCorrea', repo: 'funac-system' };
+// Lê owner e repo do .env
+const owner = process.env.GITHUB_REPO_OWNER;
+const repo = process.env.GITHUB_REPO_NAME;
+if (!owner || !repo) {
+  console.error('GITHUB_REPO_OWNER ou GITHUB_REPO_NAME não definidos no .env.');
+  process.exit(1);
 }
 
-const { owner, repo } = getRepoInfo();
+// Exibe para debug
+// console.log('Owner:', owner, 'Repo:', repo);
 const SECRET_NAME = 'REPO_GH_TOKEN';
 console.log(`Atualizando secret ${SECRET_NAME} no repositório ${owner}/${repo}...`);
 try {
