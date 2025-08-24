@@ -25,7 +25,18 @@ jobs:
           node-version: 18
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Create Release Pull Request or Publish
-        run: pnpm exec changeset version && pnpm exec changeset publish
+      - name: Version packages and create release
+        run: |
+          pnpm exec changeset version
+          pnpm build
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_GH_TOKEN }}
+      - name: Commit version changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain)" ]; then
+            git add .
+            git commit -m "chore: version packages [skip ci]"
+            git push
+          fi
