@@ -1,52 +1,97 @@
 # Copilot Instructions for funac-system Monorepo
 
-## Visão Geral da Arquitetura
+## Architecture Overview
 
-- Monorepo gerenciado com Turborepo, usando workspaces do pnpm.
-- Principais apps:
-  - `apps/web`: Frontend Next.js (autenticação, dashboard, UI moderna com shadcn/ui).
-  - `apps/api`: Backend NestJS (autenticação JWT, controle de usuários, MongoDB via Mongoose).
-  - `apps/docs`: Documentação Next.js.
-- Pacotes compartilhados:
-  - `packages/ui`: Componentes React compartilhados (com Tailwind CSS).
-  - `packages/eslint-config`, `packages/typescript-config`, `packages/tailwind-config`: Configurações compartilhadas.
+**Monorepo Structure**: Turborepo + pnpm workspaces with automated release management via Changesets.
 
-## Fluxos e Convenções
+### Core Applications
+- **`apps/api`**: NestJS backend with JWT auth, MongoDB/Mongoose, role-based access control
+- **`apps/web`**: Next.js 14+ frontend with shadcn/ui, authentication flows, dashboard
+- **`apps/docs`**: Next.js documentation site
 
-- **Autenticação**: API expõe endpoints REST sob `/auth` e `/user`, protegidos por JWT. Frontend consome esses endpoints e armazena o token no localStorage.
-- **Padrão de UI**: Uso extensivo de shadcn/ui e Tailwind. Componentes customizados ficam em `apps/web/components/ui`.
-- **Testes**: API possui testes unitários e e2e (Jest). Testes ficam em `src/**/*.spec.ts` e `test/`.
-- **Commits**: Uso obrigatório de Conventional Commits, Husky, lint-staged e Commitizen. Commits semânticos validados em pre-commit.
-- **CI/CD**: Workflow de release automatizado em `.github/workflows/release.yml` usando Changesets e GitHub Actions.
+### Shared Packages
+- **`packages/ui`**: React components with Tailwind CSS (using ui- prefix)
+- **`packages/*-config`**: Centralized ESLint, TypeScript, and Tailwind configurations
 
-## Comandos Essenciais
+## Authentication Flow
 
-- Instalar dependências: `pnpm install`
-- Rodar frontend: `pnpm --filter web dev`
-- Rodar backend: `pnpm --filter api start:dev`
-- Rodar testes API: `pnpm --filter api test` e `pnpm --filter api test:e2e`
-- Lint (monorepo): `pnpm lint` (executa turbo run lint)
-- Commit semântico: `pnpm commit`
+**Backend Pattern**: JWT tokens via `/auth/login`, protected routes use `@UseGuards(JwtAuthGuard)`
+```typescript
+// API endpoint protection
+@UseGuards(JwtAuthGuard)
+@Roles('admin') // Optional role restriction
+@Get('admin')
+getAdminResource() { ... }
+```
 
-## Integrações e Padrões Específicos
+**Frontend Pattern**: Token stored in localStorage, automatic redirect on 401
+```typescript
+// Standard auth check in pages
+useEffect(() => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    router.push('/auth/signin');
+    return;
+  }
+  // Make authenticated request
+}, []);
+```
 
-- **Integração web/api**: URLs de API são configuradas via `NEXT_PUBLIC_API_URL` no frontend.
-- **MongoDB**: Configuração via `.env` na raiz da API.
-- **Configuração de UI**: Tailwind e shadcn/ui centralizados, com aliases definidos em `components.json`.
-- **Scripts customizados**: Atualização de secrets do GitHub via `scripts/update-github-secret.js`.
+## Development Workflows
 
-## Dicas para Agentes AI
+### Essential Commands
+```bash
+pnpm install                    # Install all dependencies
+pnpm --filter web dev          # Run frontend dev server
+pnpm --filter api start:dev    # Run backend with hot reload
+pnpm lint                      # Lint entire monorepo
+pnpm commit                    # Interactive conventional commits
+pnpm clear                     # Clean node_modules, temp, dist
+pnpm changeset-report          # Generate automated changeset reports
+```
 
-- Sempre classifique arquivos modificados por grupo (web, api, docs, ui, configs) e tipo de alteração (feat, fix, chore, etc) ao sugerir commits.
-- Siga as instruções de `.github/instructions/commit.instructions.md` para análise de commit.
-- Para novos endpoints, siga o padrão de controllers/services/modules do NestJS.
-- Para novos componentes, siga o padrão de composição e estilização do shadcn/ui.
-- Use os pacotes de configuração compartilhados para garantir consistência de lint, TS e Tailwind.
+### Testing Strategy
+- **API**: Unit tests (`*.spec.ts`) + E2E tests (`test/*.e2e-spec.ts`)
+- **Run tests**: `pnpm --filter api test` or `pnpm --filter api test:e2e`
 
-## Exemplos de Arquivos-Chave
+## Project-Specific Patterns
 
-- API: `apps/api/src/auth/auth.service.ts`, `apps/api/src/user/user.controller.ts`
-- Web: `apps/web/app/auth/signin/page.tsx`, `apps/web/components/ui/button.tsx`
-- Config: `packages/eslint-config/base.js`, `packages/typescript-config/base.json`
+### NestJS API Structure
+- **Services**: Business logic with Mongoose models
+- **Controllers**: Route handlers with validation decorators
+- **Guards**: JWT auth + role-based access (`JwtAuthGuard`, `RolesGuard`)
+- **Schemas**: Mongoose schemas in `*.schema.ts` files
 
-Seções ou padrões não documentados? Peça feedback ao usuário para detalhar fluxos ou integrações específicas.
+### UI Components (shadcn/ui)
+- **Base components**: `apps/web/components/ui/*` (Button, Card, Alert, etc.)
+- **App components**: `apps/web/components/app-*.tsx` (AppSidebar, etc.)
+- **Styling**: Tailwind with CSS variables, aliases in `components.json`
+
+### Commit Automation
+- **Trigger**: `"faça o relatorio de commit"` → runs automated commit analysis
+- **Conventional Commits**: Enforced via Husky + lint-staged
+- **Changesets**: Automated version bumping based on commit types
+
+## Configuration Patterns
+
+### Environment Variables
+- **API**: `JWT_SECRET`, `JWT_EXPIRES_IN`, MongoDB connection in `.env`
+- **Web**: `NEXT_PUBLIC_API_URL` for API integration
+
+### Turborepo Tasks
+- Tasks run with dependency graph: `build`, `lint`, `check-types`
+- `dev` tasks are persistent and uncached
+
+## AI Agent Guidelines
+
+1. **File Classification**: Always group changes by workspace (`apps/api`, `apps/web`, `packages/*`, `root`)
+2. **Conventional Commits**: Use type priority: `fix` > `feat` > `perf` > `refactor` > `docs` > `test` > `build` > `ci` > `style` > `chore`
+3. **API Changes**: Follow NestJS controller/service/module pattern with proper decorators
+4. **UI Changes**: Use shadcn/ui composition patterns with Tailwind
+5. **Breaking Changes**: Mark when changing public APIs, exports, or route signatures
+
+### Key Reference Files
+- **Auth Flow**: `apps/api/src/auth/auth.service.ts`, `apps/web/app/auth/signin/page.tsx`
+- **API Structure**: `apps/api/src/user/user.controller.ts`
+- **UI Patterns**: `apps/web/components/app-sidebar.tsx`
+- **Automation**: `scripts/changeset-report.ts`, `.github/instructions/commit.instructions.md`

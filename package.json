@@ -7,16 +7,20 @@
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "commit": "cz"
+    "commit": "cz",
+    "clear": "rmdir /s /q node_modules 2>nul & rmdir /s /q temp 2>nul & rmdir /s /q dist 2>nul & echo Pastas node_modules, temp e dist removidas com sucesso!",
+    "changeset-report": "npx tsx scripts/changeset-report.ts"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.6",
+    "@types/node": "^22.15.30",
     "commitizen": "^4.3.1",
     "cz-conventional-changelog": "^3.3.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.5",
     "prettier": "^3.6.0",
     "prettier-plugin-tailwindcss": "^0.6.11",
+    "tsx": "^4.7.1",
     "turbo": "^2.5.6"
   },
   "packageManager": "pnpm@8.15.6",
