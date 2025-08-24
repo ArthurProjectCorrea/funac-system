@@ -1,28 +1,40 @@
 name: Release
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
     types: [closed]
+  workflow_dispatch:
 
 jobs:
   release:
-    if: github.event.pull_request.merged == true
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.REPO_GH_TOKEN }}
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'pnpm'
-      - name: Install pnpm
-        run: npm install -g pnpm
+          node-version: 18
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Create Release Pull Request or Publish
-        run: pnpm exec changeset version && pnpm exec changeset publish
+      - name: Create Release Pull Request or Version Packages
+        uses: changesets/action@v1
+        with:
+          version: pnpm exec changeset version
+          title: "chore: version packages"
+          commit: "chore: version packages [skip ci]"
         env:
           GITHUB_TOKEN: ${{ secrets.REPO_GH_TOKEN }}
