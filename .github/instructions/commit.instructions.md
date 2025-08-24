@@ -30,5 +30,22 @@ Antes de iniciar a análise, utilize comandos como git status para listar todos 
    - Are there any breaking changes? (y/N)
    - Does this change affect any open issues? (y/N)
      (Se sim, peça para listar os issues)
-5. Com todas as respostas, gere um arquivo .json em uma pasta temp na raiz do monorepo contendo o resultado da análise.
+
+5. Com todas as respostas, gere um novo arquivo .json em uma pasta temp na raiz do monorepo contendo o resultado da análise. O nome do arquivo deve ser apenas a data e hora da geração, seguindo o padrão <timestamp>.json (exemplo: 20250823-153000.json), garantindo que cada solicitação gere um novo arquivo sem sobrescrever anteriores.
    - Para cada grupo, inclua no .json o comando git add com os nomes dos arquivos daquele grupo, para agilizar o trabalho de preparação do commit.
+
+6. Sempre inclua no relatório um modelo de respostas do formulário do pnpm commit para cada grupo, conforme abaixo:
+
+```json
+{
+  "grupo": {
+    "type": "feat",
+    "scope": "(opcional)",
+    "shortDescription": "Breve descrição imperativa (máx 89 caracteres)",
+    "longDescription": "Descrição longa (pressione enter para pular)",
+    "breakingChanges": false,
+    "affectsOpenIssues": false,
+    "issues": []
+  }
+}
+```
